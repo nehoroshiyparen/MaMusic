@@ -1,0 +1,12 @@
+# backend/music-service/Dockerfile
+
+FROM node:18
+
+WORKDIR /app/music-service
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,35 @@
+{
+  "name": "music-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.15.0",
+    "express": "^5.1.0",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.817.0",
+    "dotenv": "^16.5.0",
+    "kafkajs": "^2.2.4",
+    "load-esm": "^1.0.2",
+    "multer": "^2.0.0",
+    "music-metadata": "^11.2.3",
+    "pg": "^8.15.6",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7",
+    "zod": "^3.25.28"
+  }
+}

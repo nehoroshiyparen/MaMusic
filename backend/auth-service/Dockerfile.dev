@@ -1,0 +1,14 @@
+# backend/auth-service/Dockerfile
+
+FROM node:18
+
+WORKDIR /app/auth-service
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 50051
+
+CMD ["npm", "run", "dev"]

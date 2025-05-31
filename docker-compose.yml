@@ -1,0 +1,121 @@
+version: '3.9'
+
+services:
+  gateway:
+    build: 
+      context: ./backend/gateway
+      dockerfile: ./Dockerfile.dev
+    working_dir: /app/gateway
+    volumes:
+      - ./backend/gateway:/app/gateway
+      - ./backend/shared:/app/shared
+      - /app/gateway/node_modules
+    ports:
+      - '4000:4000'
+    depends_on:
+      - music-service
+      - auth-service
+      - user-service
+  
+  music-service:
+    build: 
+      context: ./backend/music-service
+      dockerfile: ./Dockerfile.dev
+    working_dir: /app/music-service
+    volumes:
+      - ./backend/music-service:/app/music-service
+      - ./backend/shared:/app/shared
+      - /app/music-service/node_modules
+    ports:
+      - "5112:5112"
+  
+  auth-service:
+    build: 
+      context: ./backend/auth-service
+      dockerfile: ./Dockerfile.dev
+    working_dir: /app/auth-service
+    volumes: 
+      - ./backend/auth-service:/app/auth-service
+      - ./backend/shared:/app/shared
+      - /app/auth-service/node_modules
+    ports:
+      - "5001:5001"
+      - "50051:50051" 
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      GRPC_PORT: 50051
+    depends_on:
+      - redpanda
+    
+  user-service:
+    build: 
+      context: ./backend/user-service
+      dockerfile: ./Dockerfile.dev
+    working_dir: /app/user-service
+    volumes: 
+      - ./backend/user-service:/app/user-service
+      - ./backend/shared:/app/shared
+      - /app/user-service/node_modules
+    ports:
+      - "5223:5223"
+      - "50152:50152"
+    environment:
+      - GRPC_PORT=50152
+  
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1212
+      POSTGRES_DB: auth_service_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+  
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1212
+      POSTGRES_DB: user_service_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+
+  music-db:
+    image: postgres:15
+    container_name: music-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1212
+      POSTGRES_DB: music_service_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - music_db_data:/var/lib/postgresql/data
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.10
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=512M
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+    ports:
+      - "9092:9092"
+  
+volumes:
+  auth_db_data:
+  user_db_data:
+  music_db_data:

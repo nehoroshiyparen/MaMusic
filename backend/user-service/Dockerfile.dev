@@ -1,0 +1,14 @@
+# backend/user-service/Dockerfile
+
+From node:18
+
+WORKDIR /app/user-service
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 50152
+
+CMD ["npm", "run", "dev"]

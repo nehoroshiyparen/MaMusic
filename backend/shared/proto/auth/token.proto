@@ -1,0 +1,17 @@
+// gateway-auth
+
+syntax = "proto3";
+
+package token;
+
+service Token {
+    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+}
+
+message RefreshTokenRequest {
+    string refreshToken = 1;
+}
+
+message RefreshTokenResponse {
+    string accessToken = 1;
+}
