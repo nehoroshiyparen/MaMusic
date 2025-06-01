@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, InferAttributes, Model } from "sequelize";
 import sequelize from "../config/sequelize";
 import TrackMeta from "./TrackMeta.model";
 
@@ -37,4 +37,5 @@ Track.init(
     }
 )
 
+export type TrackAttributes = InferAttributes<Track>
 export default Track

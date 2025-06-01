@@ -11,33 +11,38 @@ import Genre from 'src/config/db/modeles/Gener.model'
 import TrackMetaGenres from 'src/config/db/modeles/TrackMetaGenres.model'
 import { logError } from 'shared/common/utils/logger/logger'
 import { UploadTrackResponse } from 'src/responses/upload/uploadTrack.response'
+import { TrackRepository } from 'src/repositories/track.repository'
+import { GenreRepository } from 'src/repositories/genre.repository'
+import { TrackService } from './tracks.service'
+import { TrackMetaService } from './trackMeta.service'
+import { GenreService } from './genre.service'
 
 dotenv.config()
 
-export class MusicService {
+export class UploadService {
     constructor(
         private sequelize: Sequelize,
-        private s3Service: S3Service
+        private s3Service: S3Service,
+        private trackService: TrackService,
+        private trackMetaService: TrackMetaService,
+        private genreService: GenreService,
     ) {
     }
 
-    async uploadTrack(track: MulterFile, sender_id: number, trackSettings: CreateTrackDto, cover?: MulterFile): Promise<UploadTrackResponse> {
+    async uploadTrack(track: MulterFile, user_id: number, trackSettings: CreateTrackDto, cover?: MulterFile): Promise<UploadTrackResponse> {
         const transaction = await this.sequelize.transaction()
         const uploadedKeys = []
         try {
             const { buffer, originalname, mimetype } = track
             const meta = await getMetadataFromBuffer(buffer)
 
-            const trackModel = await Track.create({
-                file_url: '',
-                owner_id: sender_id,
-            })
+            const trackModel = await this.trackService.createTrack({ owner_id: user_id }, transaction)
 
             const trackKey = this.s3Service.generateS3Key('tracks', trackModel.id, originalname)
             await this.s3Service.sendObjectS3(trackKey, buffer, mimetype)
             uploadedKeys.push(trackKey)
 
-            await trackModel.update({ file_url: trackKey }, { transaction })
+            await this.trackService.updateTrackData(trackModel.id, { file_url: trackKey }, transaction)
 
             let coverKey: string | undefined
             if (cover) {
@@ -46,32 +51,25 @@ export class MusicService {
                 uploadedKeys.push(coverKey)
             }
 
-            const metaPayload = {
-                track_id: trackModel.id,
-                title: trackSettings.title,
-                artists: trackSettings.artists,
-                duration: meta.format.duration,
-                ...(coverKey && { cover_url: coverKey }),
-            }
+            const trackMetaModel = await this.trackMetaService.createTrackMeta(
+                trackModel.id,
+                {
+                    title: trackSettings.title,
+                    artists: trackSettings.artists,
+                    duration: meta.format.duration,
+                    cover_url: coverKey,
+                },
+                transaction
+            )
 
-            const trackMetaModel = await TrackMeta.create(metaPayload, { transaction })
-
-            const genreName = meta.common.genre
-            if (genreName) {
-                const existing_genre = await Genre.findOne({
-                    where: {name: genreName}
-                })
-
-                if (!existing_genre) {
-                    const genre = await Genre.create({
-                        name: genreName
-                    }, {transaction})
-
-                    TrackMetaGenres.create({
-                        track_meta_id: trackMetaModel.id,
-                        genre: genre.id
-                    }, {transaction})
-                }
+            const genres = meta.common.genre
+            if (genres && genres.length > 0) {
+                await Promise.all(
+                    genres.map(async (genre) => {
+                        const genreModel = await this.genreService.findOrCreateGenre(genre, transaction)
+                        await this.genreService.attachGenreToTrackMeta(genreModel.id, trackMetaModel.id)
+                    })
+                )
             }
 
             await transaction.commit()

@@ -9,15 +9,16 @@ import { CreatePlaylistDto } from "src/dto/playlist/createPlaylist.dto";
 import { PlaylistRepository } from "src/repositories/playlist.repository";
 import { CreatePlaylistRespose } from "src/responses/playlists/createPlaylist.reponse";
 import { createPlaylistLink } from "src/utils/urlBuilders/urlFactory";
-import { PlaylistValidator } from "src/validators/playlist.validator";
-import { TrackValidator } from "src/validators/track.validator";
+import { PlaylistAssertions } from "src/assertions/playlist.assertions";
+import { TrackService } from "./tracks.service";
+import { TrackAssertions } from "src/assertions/track.assertions";
 
 export class PlaylistService {
     constructor(
         private sequelize: Sequelize,
-        private playlistValidator: PlaylistValidator,
-        private trackValidator: TrackValidator,
+        private playlistAssertions: PlaylistAssertions,
         private playlistRepository: PlaylistRepository,
+        private trackService: TrackService,
     ) {}
 
     // С самого начала создается дефолтный плейлист. Позже он дополняется
@@ -27,24 +28,11 @@ export class PlaylistService {
         try {
             const url = createPlaylistLink()
 
-            const playlist = await Playlist.create({
-                owner_id: user_id,
-                url
-            }, {transaction})
+            const playlist = await this.playlistRepository.createPlaylist(user_id, url, transaction)
 
-            const track = await Track.findOne({
-                where: { id: playlistDto.track.id }
-            })
+            const track = await this.trackService.fetchTrack(playlistDto.track.id)
 
-            if (!track) {
-                throw ApiError.NotFound('There is no track with this ID', 'NO_TRACK_FOUND')
-            }
-
-            await Playlist_Tracks.create({
-                playlist_id: playlist.id,
-                track_id: track.id,
-                order: 1
-            }, {transaction})
+            await this.playlistRepository.addTrack(playlist.id, track.id, 1, transaction)
 
             await transaction.commit()
             return { url }
@@ -55,31 +43,47 @@ export class PlaylistService {
     }
 
     async addTrackToPlaylist(playlist_id: number, track_id: number, user_id: number) {
-        const playlist = await this.playlistValidator.ensurePlaylistExists(playlist_id)
-        this.playlistValidator.ensureUserCanEdit(user_id, playlist)
+        try {
+            const playlist = await this.playlistAssertions.ensurePlaylistExists(playlist_id)
+            this.playlistAssertions.ensureUserCanEdit(user_id, playlist)
 
-        await this.trackValidator.ensureTrackExists(track_id)
+            const track = await this.trackService.fetchTrack(track_id)
 
-        const maxOrder = await this.playlistRepository.getMaxOrder(playlist_id)
-        const nextOrderNumber = maxOrder ? maxOrder : 1
+            if (!track) {
+                throw ApiError.NotFound('Track does not exists', 'TRACK_DOES_NOT_EXISTS')
+            }
 
-        await this.playlistRepository.addTrack(playlist_id, track_id, nextOrderNumber)
+            const maxOrder = await this.playlistRepository.getMaxOrder(playlist_id)
+            const nextOrderNumber = maxOrder ? maxOrder : 1
 
-        return { success: true }
+            await this.playlistRepository.addTrack(playlist_id, track_id, nextOrderNumber)
+
+            return { success: true }
+        } catch (e) {
+            throw rethrowAsApiError('Error while pulling track into playlist', 'ADD_TRACK_TO_PLAYLIST_ERROR', e)
+        }
     }
 
     async deleteTrackFromPlaylist(playlist_id: number, track_id: number, user_id: number) {
-        const playlist = await this.playlistValidator.ensurePlaylistExists(playlist_id)
-        this.playlistValidator.ensureUserCanEdit(user_id, playlist)
+        try {
+            const playlist = await this.playlistAssertions.ensurePlaylistExists(playlist_id)
+            this.playlistAssertions.ensureUserCanEdit(user_id, playlist)
 
-        await this.trackValidator.ensureTrackExists(track_id)
+            const track = await this.trackService.fetchTrack(track_id)
 
-        const trackRow = await this.playlistValidator.ensureTrackInPlaylist(playlist_id, track_id)
+            if (!track) {
+                throw ApiError.NotFound('Track does not exists', 'TRACK_DOES_NOT_EXISTS')
+            }
 
-        await this.playlistRepository.removeTrack(playlist_id, track_id)
+            const trackRow = await this.playlistAssertions.ensureTrackInPlaylist(playlist_id, track_id)
 
-        await this.playlistRepository.decrementOrederAfter(playlist_id, trackRow.order)
+            await this.playlistRepository.removeTrack(playlist_id, track_id)
 
-        return { success: true }
+            await this.playlistRepository.decrementOrederAfter(playlist_id, trackRow.order)
+
+            return { success: true }
+        } catch (e) {
+            throw rethrowAsApiError('Error while removing track from playlist', 'REMOVE_TRACK_FROM_PLAYLIST_ERROR', e)
+        }
     }
 }

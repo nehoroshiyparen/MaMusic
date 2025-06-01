@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, InferAttributes, Model } from "sequelize";
 import sequelize from '../config/sequelize'
 
 class TrackMeta extends Model {
@@ -52,4 +52,5 @@ TrackMeta.init(
     }
 )
 
+export type TrackMetaAttributes = InferAttributes<TrackMeta>
 export default TrackMeta

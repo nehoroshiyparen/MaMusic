@@ -4,7 +4,7 @@ import Playlist from "src/config/db/modeles/Playlist.model";
 import Playlist_Tracks from "src/config/db/modeles/Playlist_Tracks.model";
 import { PlaylistRepository } from "src/repositories/playlist.repository";
 
-export class PlaylistValidator {
+export class PlaylistAssertions {
     constructor(
         private sequelize: Sequelize,
         private playlistRepository: PlaylistRepository,

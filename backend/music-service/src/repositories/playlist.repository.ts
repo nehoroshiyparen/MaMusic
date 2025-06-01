@@ -1,4 +1,5 @@
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
+import Playlist from "src/config/db/modeles/Playlist.model";
 import Playlist_Tracks from "src/config/db/modeles/Playlist_Tracks.model";
 
 export class PlaylistRepository {
@@ -7,32 +8,42 @@ export class PlaylistRepository {
     ) {}
 
     async findTrackInPlaylist(playlist_id: number, track_id: number): Promise<Playlist_Tracks | null> {
-        return Playlist_Tracks.findOne({
+        return await Playlist_Tracks.findOne({
             where: { playlist_id, track_id }
         })
     }
 
-    async addTrack(playlist_id: number, track_id:number, order: number): Promise<Playlist_Tracks> {
-        return Playlist_Tracks.create({
+    async createPlaylist(owner_id: number, url: string, transaction?: Transaction): Promise<Playlist> {
+        const playlist = await Playlist.create({
+            owner_id,
+            url
+        }, transaction ? { transaction } : undefined)
+
+        return playlist
+    }
+
+    async addTrack(playlist_id: number, track_id:number, order: number, transaction?: Transaction): Promise<Playlist_Tracks> {
+        return await Playlist_Tracks.create({
             playlist_id,
             track_id,
             order
-        })
+        }, transaction ? { transaction } : undefined)
     }
 
-    async removeTrack(playlist_id: number, track_id: number): Promise<void> {
-        Playlist_Tracks.destroy({
+    async removeTrack(playlist_id: number, track_id: number, transaction?: Transaction): Promise<void> {
+        await Playlist_Tracks.destroy({
             where: {
                 playlist_id,
                 track_id
-            }
+            },
+            ...(transaction ? { transaction } : undefined)
         })
     }
 
     /**
      * Возвращает максимальный order для треков в плейлисте.
      */
-    async getMaxOrder(playlist_id: number): Promise<number> {
+    async getMaxOrder(playlist_id: number, transaction?: Transaction): Promise<number> {
         const maxOrder = await Playlist_Tracks.findOne({
             where: { playlist_id },
             attributes: ['order'],
@@ -47,8 +58,8 @@ export class PlaylistRepository {
      * @param playlist_id 
      * @param order - ордер удаленного трека
      */
-    async decrementOrederAfter(playlist_id: number, order: number): Promise<void> {
-        Playlist_Tracks.increment(
+    async decrementOrederAfter(playlist_id: number, order: number, transaction?: Transaction): Promise<void> {
+        await Playlist_Tracks.increment(
             { order: -1 },
             { 
                 where: {
@@ -56,7 +67,7 @@ export class PlaylistRepository {
                     order: {
                         [Op.gt]: order
                     }
-                }
+                }, ...(transaction ? { transaction } : undefined)
             }
         )
     }

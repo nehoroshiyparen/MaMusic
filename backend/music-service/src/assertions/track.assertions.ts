@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import { ApiError } from "shared/common/utils/ApiError/api-error";
 import Track from "src/config/db/modeles/Track.model";
 
-export class TrackValidator {
+export class TrackAssertions {
     constructor(
         private sequelize: Sequelize,
     ) {}
@@ -13,9 +13,7 @@ export class TrackValidator {
             attributes: []
         })
 
-        if (!track) {
-            throw ApiError.NotFound('Track does not exists', 'TRACK_DOES_NOT_EXISTS')
-        }
+        if (!track) throw ApiError.NotFound('Track does not exists', 'TRACK_DOES_NOT_EXISTS')
 
         return track
     }
