@@ -1,4 +1,4 @@
-import { ApiError } from '../utils/api-error'
+import { ApiError } from '../utils/ApiError/api-error'
 import { logError, logInfo } from '../utils/logger/logger'
 import { SagaStep } from './interfaces/SagaStep.interface'
 

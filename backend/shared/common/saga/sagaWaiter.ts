@@ -1,4 +1,4 @@
-import { ApiError } from "../utils/api-error"
+import { ApiError } from "../utils/ApiError/api-error"
 import { SagaAck } from "./interfaces/SagaAck.interface"
 
 

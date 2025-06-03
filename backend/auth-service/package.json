@@ -25,7 +25,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --poll --interval 500 --require tsconfig-paths/register src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "proto:gen": "sh ./src/grpc/proto/build.sh"

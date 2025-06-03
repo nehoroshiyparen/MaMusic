@@ -26,7 +26,7 @@ export class TrackController {
 
     async fetchTrack(req: Request, res: Response) {
         try {
-            const id = req.params
+            const id = req.params.id
 
             const track = await this.trackService.fetchTrack(Number(id))
 

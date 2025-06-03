@@ -26,7 +26,7 @@ export async function authenticateToken(req: Request, res: Response, next: NextF
   } catch (_err) {
     const refreshToken = req.cookies?.refreshToken
     if (!refreshToken) {
-      return next(ApiError.Unauthorized('No refresh token found', 'NO_REFRESH_TOKEN'))
+      sendError(res, ApiError.Unauthorized('No refresh token found', 'NO_REFRESH_TOKEN'))
     }
 
     try {

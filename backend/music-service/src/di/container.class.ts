@@ -16,6 +16,7 @@ import { TrackRepository } from "src/repositories/track.repository";
 import { TrackMetaService } from "src/services/trackMeta.service";
 import { PlaylistService } from "src/services/playlist.service";
 import { GenreService } from "src/services/genre.service";
+import { PlaylistController } from "src/controllers/playlist.controller";
 
 dotenv.config()
 
@@ -38,6 +39,7 @@ export class Container {
     private _uploadService: UploadService;
 
     private _uploadController: UploadController;
+    private _playlistController: PlaylistController;
     private _trackController: TrackController;
 
     constructor() {
@@ -59,10 +61,12 @@ export class Container {
         this._uploadService = new UploadService(this._sequelize, this._s3Service, this._trackService, this._trackMetaService, this._genreService)
 
         this._uploadController = new UploadController(this._uploadService)
+        this._playlistController = new PlaylistController(this._playlistService)
         this._trackController = new TrackController(this._trackService)
     }
 
     
     getUploadController() { return this._uploadController }
+    getPlaylistController() { return this._playlistController }
     getTrackController() { return this._trackController }
 }

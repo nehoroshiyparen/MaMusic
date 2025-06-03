@@ -8,10 +8,11 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "types": ["jest"],
     "paths": {
       "shared/*": ["../shared/*"]
     },
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "jest.config.ts"],
   "exclude": ["node_modules"]
 }

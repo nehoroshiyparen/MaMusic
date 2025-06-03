@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   gateway:
     build: 
@@ -58,7 +56,6 @@ services:
       - /app/user-service/node_modules
     ports:
       - "5223:5223"
-      - "50152:50152"
     environment:
       - GRPC_PORT=50152
   
