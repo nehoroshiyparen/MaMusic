@@ -22,17 +22,22 @@ Playlist_Tracks.init(
         order: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: true
         }
     },
     {
         sequelize,
         tableName: 'Playlist_Tracks',
         modelName: 'Playlist_Tracks',
+        indexes: [
+            {
+                unique: true,
+                fields: ['playlist_id', 'order']
+            }
+        ]
     }
 )
 
-Playlist.belongsToMany(Track, { through: Playlist_Tracks, foreignKey: 'playlist_id', as: 'tracks' })
-Track.belongsToMany(Playlist, { through: Playlist_Tracks, foreignKey: 'track_id', as: 'playlists'})
+Playlist_Tracks.belongsTo(Playlist, { foreignKey: 'playlist_id' })
+Playlist_Tracks.belongsTo(Track, { foreignKey: 'track_id', as: 'track' })
 
 export default Playlist_Tracks

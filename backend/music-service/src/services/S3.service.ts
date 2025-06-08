@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { DeleteObjectCommand, PutObjectCommand, S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 export class S3Service {
     constructor(
@@ -30,5 +30,17 @@ export class S3Service {
 
     generateS3Key(folder: string, identifier: string | number, filename: string): string {
         return `${folder}/${identifier}_${filename}`
+    }
+
+    async getStreamByRange(key: string, byteRange: string) {
+        const response = await this.s3.send(
+            new GetObjectCommand({
+                Bucket: this.BucketName,
+                Key: key,
+                Range: byteRange
+            })
+        )
+
+        return response
     }
 }

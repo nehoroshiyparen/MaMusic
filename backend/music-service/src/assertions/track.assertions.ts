@@ -10,7 +10,6 @@ export class TrackAssertions {
     async ensureTrackExists(track_id: number): Promise<Track> {
         const track = await Track.findOne({
             where: { id: track_id },
-            attributes: []
         })
 
         if (!track) throw ApiError.NotFound('Track does not exists', 'TRACK_DOES_NOT_EXISTS')

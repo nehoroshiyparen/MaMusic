@@ -16,6 +16,11 @@ Track_Likes.init(
         track_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
+            references: {
+                model: 'Track',
+                key: 'id'
+            },
+            onDelete: 'CASCADE'
         }
     },
     {
@@ -26,7 +31,12 @@ Track_Likes.init(
     }
 )
 
-Track.hasMany(Track_Likes, { foreignKey: 'track_id', as: 'likes'})
+Track.hasMany(Track_Likes, { 
+    foreignKey: 'track_id', 
+    as: 'likes',
+    onDelete: 'CASCADE',
+    hooks: true
+})
 Track_Likes.belongsTo(Track, { foreignKey: 'track_id', as: 'track' })
 
 export default Track_Likes

@@ -40,7 +40,7 @@ export async function authenticateToken(req: Request, res: Response, next: NextF
         httpOnly: true,
         sameSite: 'lax',
         secure: false,
-        maxAge: 18000000
+        maxAge: 1800000
       })
       logInfo(`Refreshed access token for user ${decoded.username}`, correlationId)
       next()

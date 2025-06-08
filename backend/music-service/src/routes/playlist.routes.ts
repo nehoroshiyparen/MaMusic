@@ -10,11 +10,51 @@ function getController() {
     return playlistController
 }
 
+router.get(
+    '/:playlist_id',
+    createHandler(() => {
+        const playlistController = getController()
+        return playlistController.fetchPlaylist.bind(playlistController)
+    })
+)
+
+router.get(
+    '/liked/:user_id',
+    createHandler(() => {
+        const playlistController = getController()
+        return playlistController.fetchUserLikedPlaylists.bind(playlistController)
+    })
+)
+
 router.post(
-    '/create',
+    '/',
     createHandler(() => {
         const playlistController = getController()
         return playlistController.createPlaylist.bind(playlistController)
+    })
+)
+
+router.patch(
+    '/:playlist_id',
+    createHandler(() => {
+        const playlistController = getController()
+        return playlistController.updatePlaylist.bind(playlistController)
+    })
+)
+
+router.post(
+    '/like/:playlist_id',
+    createHandler(() => {
+        const playlistController = getController()
+        return playlistController.likePlaylist.bind(playlistController)
+    })
+)
+
+router.post(
+    '/dislike/:playlist_id',
+    createHandler(() => {
+        const playlistController = getController()
+        return playlistController.dislikePlaylist.bind(playlistController)
     })
 )
 
@@ -26,11 +66,19 @@ router.post(
     })
 )
 
-router.post(
-    'delete/:id',
+router.delete(
+    '/:playlist_id/track',
     createHandler(() => {
         const playlistController = getController()
         return playlistController.deleteTrackFromPlaylist.bind(playlistController)
+    })
+)
+
+router.delete(
+    '/:playlist_id',
+    createHandler(() => {
+        const playlistController = getController()
+        return playlistController.deletePlaylist.bind(playlistController)
     })
 )
 

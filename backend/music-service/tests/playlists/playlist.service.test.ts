@@ -1,22 +1,7 @@
 import { Sequelize } from 'sequelize'
 import { PlaylistService } from '../../src/services/playlist.service'
 import { ApiError } from 'shared/common/utils/ApiError/api-error'
-
-const mockSequelize = {} as unknown as Sequelize
-
-const mockAssertions = {
-    ensurePlaylistExists: jest.fn(),
-    ensureUserCanEdit: jest.fn(),
-}
-
-const mockTrackService = {
-    fetchTrack: jest.fn(),
-}
-
-const mockPlaylistRepository = {
-    getMaxOrder: jest.fn(),
-    addTrack: jest.fn(),
-}
+import { mockTrackService, mockPlaylistRepository, mockAssertions, mockSequelize } from './__mocks__/playlist.mocks'
 
 describe('PlaylistService', () => {
     let service: PlaylistService

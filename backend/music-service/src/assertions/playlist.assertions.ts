@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import { ApiError } from "shared/common/utils/ApiError/api-error";
 import Playlist from "src/config/db/modeles/Playlist.model";
+import Playlist_Likes from "src/config/db/modeles/Playlist_Likes.model";
 import Playlist_Tracks from "src/config/db/modeles/Playlist_Tracks.model";
 import { PlaylistRepository } from "src/repositories/playlist.repository";
 
@@ -13,7 +14,7 @@ export class PlaylistAssertions {
     async ensurePlaylistExists(playlist_id:number): Promise<Playlist> {
         const playlist = await Playlist.findOne({
             where: { id: playlist_id },
-            attributes: ['owner_id']
+            attributes: ['id', 'owner_id']
         })
 
         if (!playlist) {
@@ -21,6 +22,32 @@ export class PlaylistAssertions {
         }
 
         return playlist
+    }
+
+    async ensurePlaylistLiked(user_id: number, playlist_id: number) {
+        const attachment = await Playlist_Likes.findOne({
+            where: {
+                user_id,
+                playlist_id
+            }
+        })
+
+        if (!attachment) {
+            throw ApiError.BadRequest('Playlist not liked', 'PLAYLIST_NOT_LIKED')
+        }
+    }
+
+    async ensurePlaylistDoNotLiked(user_id: number, playlist_id: number) {
+        const attachment = await Playlist_Likes.findOne({
+            where: {
+                user_id,
+                playlist_id
+            }
+        })
+
+        if (attachment) {
+            throw ApiError.Conflict('Playlist already liked', 'PLAYLIST_ALREADY_LIKED')
+        }
     }
 
     async ensureTrackInPlaylist(playlist_id: number, track_id: number): Promise<Playlist_Tracks> {

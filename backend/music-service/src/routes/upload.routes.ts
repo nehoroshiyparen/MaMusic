@@ -7,7 +7,7 @@ const router = Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
 router.post(
-    '/upload',
+    '/',
     upload.fields([
         { name: 'track', maxCount: 1 },
         { name: 'cover', maxCount: 1 },

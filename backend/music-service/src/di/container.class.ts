@@ -17,6 +17,9 @@ import { TrackMetaService } from "src/services/trackMeta.service";
 import { PlaylistService } from "src/services/playlist.service";
 import { GenreService } from "src/services/genre.service";
 import { PlaylistController } from "src/controllers/playlist.controller";
+import { StreamController } from "src/controllers/stream.controller";
+import { TrackMetaRepository } from "src/repositories/trackMeta.respository";
+import { StreamService } from "src/services/stream.service";
 
 dotenv.config()
 
@@ -26,6 +29,7 @@ export class Container {
     private _genreRepository: GenreRepository;
     private _playlistRepository: PlaylistRepository;
     private _trackRepository: TrackRepository;
+    private _trackMetaRepository: TrackMetaRepository;
 
     private _genreAssertions: GenreAssertions;
     private _playlistAssertions: PlaylistAssertions;
@@ -37,36 +41,42 @@ export class Container {
     private _trackMetaService: TrackMetaService;
     private _playlistService: PlaylistService;
     private _uploadService: UploadService;
+    private _streamService: StreamService;
 
     private _uploadController: UploadController;
     private _playlistController: PlaylistController;
     private _trackController: TrackController;
+    private _streamController: StreamController;
 
     constructor() {
         this._sequelize = sequelize
 
         this._genreRepository = new GenreRepository()
         this._playlistRepository = new PlaylistRepository()
-        this._trackRepository = new TrackRepository
+        this._trackRepository = new TrackRepository()
+        this._trackMetaRepository = new TrackMetaRepository()
 
         this._genreAssertions = new GenreAssertions()
         this._playlistAssertions = new PlaylistAssertions(this._sequelize, this._playlistRepository)
         this._trackAssertions = new TrackAssertions(this._sequelize)
 
         this._s3Service = new S3Service(s3, process.env.S3_BUCKET_NAME!)
-        this._trackService = new TrackService(this._sequelize, this._trackRepository, this._trackAssertions)
-        this._trackMetaService = new TrackMetaService()
+        this._trackService = new TrackService(this._sequelize, this._trackRepository, this._trackAssertions, this._s3Service)
+        this._trackMetaService = new TrackMetaService(this._trackMetaRepository)
         this._genreService = new GenreService(this._genreRepository, this._genreAssertions)
         this._playlistService = new PlaylistService(this._sequelize, this._playlistAssertions, this._playlistRepository, this._trackService)
         this._uploadService = new UploadService(this._sequelize, this._s3Service, this._trackService, this._trackMetaService, this._genreService)
+        this._streamService = new StreamService(this._trackService, this._s3Service)
 
         this._uploadController = new UploadController(this._uploadService)
         this._playlistController = new PlaylistController(this._playlistService)
         this._trackController = new TrackController(this._trackService)
+        this._streamController = new StreamController(this._streamService)
     }
 
     
     getUploadController() { return this._uploadController }
     getPlaylistController() { return this._playlistController }
     getTrackController() { return this._trackController }
+    getStreamController() { return this._streamController }
 }

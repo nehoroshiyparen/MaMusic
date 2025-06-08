@@ -16,6 +16,7 @@ import { GenreRepository } from 'src/repositories/genre.repository'
 import { TrackService } from './tracks.service'
 import { TrackMetaService } from './trackMeta.service'
 import { GenreService } from './genre.service'
+import { createFilename, getPublicUrl } from 'src/utils/urlBuilders/urlFactory'
 
 dotenv.config()
 
@@ -33,16 +34,22 @@ export class UploadService {
         const transaction = await this.sequelize.transaction()
         const uploadedKeys = []
         try {
-            const { buffer, originalname, mimetype } = track
+            const { buffer, mimetype } = track
             const meta = await getMetadataFromBuffer(buffer)
 
             const trackModel = await this.trackService.createTrack({ owner_id: user_id }, transaction)
 
-            const trackKey = this.s3Service.generateS3Key('tracks', trackModel.id, originalname)
+            const filename = createFilename(trackSettings.title, trackSettings.artists)
+
+            const trackKey = this.s3Service.generateS3Key('tracks', trackModel.id, filename)
             await this.s3Service.sendObjectS3(trackKey, buffer, mimetype)
             uploadedKeys.push(trackKey)
 
-            await this.trackService.updateTrackData(trackModel.id, { file_url: trackKey }, transaction)
+            const trackUrl = getPublicUrl(trackKey)
+
+            await this.trackService.updateTrackData(trackModel, { file_url: trackUrl }, transaction)
+
+            await this.trackService.trustedLikeTrack(user_id, trackModel.id, transaction)
 
             let coverKey: string | undefined
             if (cover) {
@@ -67,13 +74,13 @@ export class UploadService {
                 await Promise.all(
                     genres.map(async (genre) => {
                         const genreModel = await this.genreService.findOrCreateGenre(genre, transaction)
-                        await this.genreService.attachGenreToTrackMeta(genreModel.id, trackMetaModel.id)
+                        await this.genreService.attachGenreToTrackMeta(genreModel.id, trackMetaModel.id, transaction)
                     })
                 )
             }
 
             await transaction.commit()
-            return { trackUrl: trackKey, ...(coverKey && { coverUrl: coverKey }) }
+            return { trackUrl: `${trackUrl}`, ...(coverKey && { coverUrl: coverKey }) }
         } catch (e) {
             await transaction.rollback()
 

@@ -1,8 +1,7 @@
 import { Transaction } from "sequelize";
 import Track, { TrackAttributes } from "src/config/db/modeles/Track.model";
-import Track_Likes from "src/config/db/modeles/Track_likes.model";
+import Track_Likes from "src/config/db/modeles/Track_Likes.model";
 import TrackMeta, { TrackMetaAttributes } from "src/config/db/modeles/TrackMeta.model";
-import { parseArgs } from "util";
 
 export class TrackRepository {
     constructor(
@@ -23,14 +22,11 @@ export class TrackRepository {
             Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
         )
 
-        await track.update({
-            cleanedParams
-        }, transaction ? { transaction } : undefined)
+        await track.update(cleanedParams, transaction ? { transaction } : undefined)
     }
 
     async fetchTrack(id: number) {
         const track = await Track.findOne({
-            attributes: { exclude: ['file_url'] },
             where: { 
                 id
             },
@@ -47,15 +43,11 @@ export class TrackRepository {
 
     async fetchUserLikedTracks(user_id: number, limit: number, offset: number) {
         const likedTracks = await Track.findAll({
-            attributes: { exclude: ['file_url'] },
-            limit,
-            offset,
             include: [
                 {
                     model: Track_Likes,
                     as: 'likes',
                     where: { user_id },
-                    attributes: [],
                     required: true
                 },
                 {
@@ -71,5 +63,20 @@ export class TrackRepository {
         })
 
         return likedTracks
+    }
+
+    async likeTrack(user_id: number, track_id: number, transaction?: Transaction) {
+        await Track_Likes.create({
+            user_id,
+            track_id,
+        }, transaction ? { transaction } : undefined)
+    }
+
+    async deleteTrack(track_id: number, transaction?: Transaction) {
+        await Track.destroy({
+            where: {
+                id: track_id
+            }, ...(transaction ? { transaction } : undefined)
+        })
     }
 }

@@ -9,7 +9,7 @@ authProxy.use(
     '/',
     (req, res, next) => {
         console.log('Proxying request:', req.method, req.url);
-        sendError(res, ApiError.Internal('Proxying request error'))
+        next()
     },
     createProxyMiddleware({
         target: "http://auth-service:5001",

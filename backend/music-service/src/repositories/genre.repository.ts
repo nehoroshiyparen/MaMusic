@@ -1,4 +1,5 @@
 import { Transaction } from "sequelize";
+import { ApiError } from "shared/common/utils/ApiError/api-error";
 import Genre from "src/config/db/modeles/Gener.model";
 import TrackMetaGenres from "src/config/db/modeles/TrackMetaGenres.model";
 
@@ -31,6 +32,6 @@ export class GenreRepository {
         await TrackMetaGenres.create({
             track_meta_id,
             genre_id,
-        }, transaction ? { transaction } : undefined)
+        }, transaction ? { transaction } : {})
     }
 }
