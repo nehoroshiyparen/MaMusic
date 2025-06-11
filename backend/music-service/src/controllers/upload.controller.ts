@@ -5,6 +5,7 @@ import { UploadService } from "src/services/upload.service";
 import { MulterFileArray } from "src/types/MulterFile.interface";
 import { logInfo } from "shared/common/utils/logger/logger";
 import { CreateTrackSchema } from "src/dto/createTrack.dto";
+import { ZodError } from "zod";
 
 export class UploadController {
     constructor(
@@ -25,7 +26,7 @@ export class UploadController {
 
             if (!validatedSettings.success) {
                 logInfo('Invalid data of the track')
-                throw ApiError.BadRequest('Invalid data of the track', 'INVALID_TRACK_DATA')
+                throw validatedSettings.error
             }
 
             const user_id = Number(req.headers['x-user-id'])

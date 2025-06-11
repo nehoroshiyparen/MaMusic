@@ -1,0 +1,23 @@
+components:
+  schemas:
+    UnauthorizedErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            statusCode:
+              example: 401
+            message:
+              example: 'Predicted error'
+            error:
+              type: object
+              properties:
+                code:
+                  type: string
+                  enum:
+                  - NO_REFRESH_TOKEN
+                  - REFRESH_UNAUTHENTICATED
+                  - ACCESS_TOKEN_EXPIRED
+                  example: NO_REFRESH_TOKEN
+                message:
+                  example: 'Unauthorized'

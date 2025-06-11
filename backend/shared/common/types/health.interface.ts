@@ -6,5 +6,5 @@ export interface HealthCheckResponse {
     uptime: number;
     service: string;
     version: string;
-    message?: string;
+    errorMessage?: string;
 }

@@ -1,0 +1,15 @@
+components:
+  schemas:
+    ApiResponseSuccess:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 200
+        message: 
+          type: string
+          example: 'Track created'
+        data:
+          type: object
+          description: 'Any data types'
+          nullable: true

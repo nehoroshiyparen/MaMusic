@@ -16,6 +16,10 @@ export class ApiError extends Error {
         return new ApiError(400, message, code, cause)
     }
 
+    static Invalid(message = 'Invalid data', code?: string, cause?: unknown) {
+        return new ApiError(400, message, code, cause)
+    }
+
     static Unauthorized(message = 'Unauthorized', code?: string, cause?: unknown) {
         return new ApiError(401, message, code, cause)
     }
@@ -32,7 +36,7 @@ export class ApiError extends Error {
         return new ApiError(409, message, code, cause)
     }
 
-    static Internal(message = 'Interna Server Error', code?: string, cause?: unknown) {
+    static Internal(message = 'Internal Server Error', code?: string, cause?: unknown) {
         return new ApiError(500, message, code, cause)
     }
 }

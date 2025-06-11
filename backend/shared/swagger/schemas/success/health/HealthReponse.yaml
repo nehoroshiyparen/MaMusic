@@ -1,0 +1,39 @@
+components:
+  schemas:
+    HealthCheckResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          example: '2025-06-09T21:00:00Z'
+        uptime:
+          type: number
+          example: 123456.78
+        service:
+          type: string
+          example: music-service
+        version:
+          type: string
+          example: '1.0.0'
+    HealthCheckResponseError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 500
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: number
+        service:
+          type: string
+        version:
+          type: string
+        errorMessage:
+          type: string
+          example: Something gone wrong...

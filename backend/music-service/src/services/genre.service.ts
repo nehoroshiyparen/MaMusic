@@ -11,7 +11,6 @@ export class GenreService {
 
     async findOrCreateGenre(name: string, transaction?: Transaction) {
         try {
-            await this.genreAssertions.ensureGenreDoesNotExists(name)
             const genre = await this.genreRepository.findOrCreateGenre(name, transaction)
 
             return genre

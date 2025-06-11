@@ -3,10 +3,12 @@ import dotenv from 'dotenv'
 import routes from './routes/index'
 import sequelize from './config/db/config/sequelize';
 import registerModels from './config/db/modeles/index'
-import { getContainer, initContainer } from './di/container';
+import { initContainer } from './di/container';
 import { logInfo, logError } from 'shared/common/utils/logger/logger';
 import { attachCorrelationId } from 'shared/common/middleware/logger.middleware'
 import { errorHandler } from 'shared/common/middleware/error.middleware'
+import swaggerUI from 'swagger-ui-express'
+import { swaggerSpec } from './config/swagger/swagger';
 
 dotenv.config()
 
@@ -31,6 +33,10 @@ class MusicServer {
         this.app.use(routes)
     }
 
+    private setupSwagger() {
+        this.app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
+    }
+
     private async connectDataBase() {
         try {
             await sequelize.authenticate();
@@ -51,6 +57,7 @@ class MusicServer {
 
             this.setupMiddleware()
             this.setupRoutes()
+            this.setupSwagger()
 
             this.app.listen(this.port, () => {
                 logInfo(`Music Service is running on port ${this.port}`)

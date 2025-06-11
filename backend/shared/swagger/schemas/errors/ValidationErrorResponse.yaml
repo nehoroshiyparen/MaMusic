@@ -1,0 +1,17 @@
+components:
+  schemas:
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            statusCode:
+              example: 400
+            message:
+              example: Not valid dto
+            error:
+              properties:
+                code:
+                  example: 'VALIDATION_ERROR'
+                message:
+                  example: 'Password must be at least 3 chaaracters'

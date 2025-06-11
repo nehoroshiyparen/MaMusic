@@ -1,0 +1,17 @@
+components:
+  schemas: 
+    InternalErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            statusCode:
+              example: 500
+            message:
+              example: Server side error
+            error:
+              properties:
+                code:
+                  example: 'INTERNAL_ERROR'
+                message:
+                  example: 'Internal Server Error'

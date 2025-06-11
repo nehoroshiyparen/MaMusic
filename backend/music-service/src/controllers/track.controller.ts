@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ApiError } from "shared/common/utils/ApiError/api-error";
 import { sendError, sendResponse } from "shared/common/utils/http";
+import { logInfo } from "shared/common/utils/logger/logger";
 import { TrackService } from "src/services/tracks.service";
 import { isNumber } from "src/utils/validators/isNumber.validator";
 
@@ -29,9 +30,13 @@ export class TrackController {
         try {
             const track_id = Number(req.params.track_id)
 
-            const validatedTrackId = isNumber.parse(track_id)
+            const validatedTrackId = isNumber.safeParse(track_id)
 
-            const track = await this.trackService.fetchTrack(validatedTrackId)
+            if (!validatedTrackId.success) {
+                throw validatedTrackId.error
+            }
+
+            const track = await this.trackService.fetchTrack(validatedTrackId.data)
 
             sendResponse(res, 200, 'Track fetched', track)
         } catch (e) {

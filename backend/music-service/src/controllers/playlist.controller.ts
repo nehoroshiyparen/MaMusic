@@ -8,6 +8,7 @@ import { DeleteTrackFromPlaylistDto, deleteTrackFromPlaylistSchema } from "src/d
 import { updatePlaylistSchema } from "src/dto/playlist/updatePlaylist.dto";
 import { PlaylistService } from "src/services/playlist.service";
 import { isNumber } from "src/utils/validators/isNumber.validator";
+import { ZodError } from "zod";
 
 export class PlaylistController {
     constructor (
@@ -70,8 +71,6 @@ export class PlaylistController {
             const { patch } = req.body
 
             const validatedPatch = updatePlaylistSchema.parse(patch)
-
-            console.log(validatedPatch)
 
             await this.playlistService.updatePlaylist(user_id, playlist_id, validatedPatch)
 

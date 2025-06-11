@@ -1,0 +1,17 @@
+components:
+  schemas:
+    ConflictErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            statusCode:
+              example: 409
+            message:
+              example: 'Predicted error'
+            error:
+              properties:
+                code:
+                  example: ENTITY_ALREADY_EXISTS
+                message:
+                  example: Entity already exists

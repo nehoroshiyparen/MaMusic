@@ -1,0 +1,18 @@
+/health:
+  get:
+    summary: Проверка состояния сервиса
+    tags:
+      - Health
+    responses:
+      200:
+        description: Успешная проверка
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthCheckResponse'
+      500:
+        description: Ошибка сервиса
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthCheckResponseError'

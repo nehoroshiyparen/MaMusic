@@ -1,0 +1,22 @@
+components:
+  schemas:
+    ApiResponseError:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 500
+        message:
+          type: string
+          example: 'Internal error'
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: 'INTERNAL_ERROR'
+              description: 'Уникальный код ошибки'
+            message:
+              type: string
+              example: 'Unpredictable error'
+              description: 'Подробное описание ошибки'

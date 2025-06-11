@@ -19,6 +19,7 @@ export class GenreAssertions {
         return genre
     }
 
+    // Здесь не нужна проброска ошибки
     async ensureGenreDoesNotExists(name: string): Promise<Genre | null> {
         const genre = await Genre.findOne({
             where: {

@@ -1,0 +1,19 @@
+components:
+  schemas:
+    BadRequestErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            statusCode: 
+              example: 400
+            message:
+              example: 'Predicted error'
+            error:
+              properties:
+                code:
+                  type: string
+                  example: 'NO_FILE_FOUND'
+                message:
+                  type: string
+                  example: 'No file found'

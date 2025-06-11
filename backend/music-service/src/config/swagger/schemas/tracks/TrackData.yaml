@@ -1,0 +1,38 @@
+components:
+  schemas:
+    TrackData:
+      description: Информация о треке включая метаданные
+      type: object
+      properties:
+        id: 
+          type: number
+          example: 25
+        owner_id:
+          type: number
+          example: 1
+        file_url:
+          type: string
+          format: uri
+          example: https://console.yandex.cloud/folders/b1gt7k3osg4pjv1r55lr/storage/buckets/nehorosiyparen-music?key=tracks%2F25_Looser,_Baby__Hazbin_Hotel
+        is_public:
+          type: boolean
+          example: true
+        meta: 
+          type: object
+          description: Метаданные трека
+          properties:
+            title: 
+              type: string
+              example: Looser, Baby
+            artists:
+              type: array
+              items:
+                type: string
+              example: ['Artist1', 'Artist2']
+            duration:
+              type: number
+              example: 175.608
+            cover_url:
+              type: string
+              nullable: true
+              format: uri

@@ -1,0 +1,31 @@
+components:
+  schemas:
+    UploadTrackDto:
+      type: object
+      required:
+        - track
+        - track_settings
+      properties:
+        track:
+          type: string
+          format: binary
+          description: 'Основной аудиофайл трека'
+        cover:
+          type: string
+          format: binary
+          description: 'Обложка трека (опционально)'
+        track_settings:
+          $ref: '#/components/schemas/CreateTrackSchema'
+
+    CreateTrackSchema:
+      type: object
+      description: 'Параметры трека: название, артисты'
+      properties:
+        title:
+          type: string
+          example: 'CEO'
+        artists:
+          type: array
+          items:
+            type: string
+          example: ['FT52NGG', 'Alblak']

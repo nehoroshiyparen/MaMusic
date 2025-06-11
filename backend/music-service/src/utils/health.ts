@@ -16,7 +16,7 @@ export const getHealthStatus = (): HealthCheckResponse => {
             uptime: process.uptime(),
             service: process.env.SERVICE_NAME || "MUSIC-SERVICE",
             version: process.env.npm_package_version || '1.0.0',
-            message: `${e}`
+            errorMessage: `${e}`
         }
     }
 }

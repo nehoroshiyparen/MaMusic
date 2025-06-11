@@ -1,0 +1,12 @@
+components:
+  schemas:
+    UploadTrackData:
+      type: object
+      properties:
+        trackUrl: 
+          type: string
+          format: uri
+        coverUrl:
+          type: string
+          format: uri
+          nullable: true
