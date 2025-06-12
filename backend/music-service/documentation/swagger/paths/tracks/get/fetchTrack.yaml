@@ -8,7 +8,7 @@ paths:
         - name: track_id
           in: path
           required: true
-          description: Уникальный индетификатор трека
+          description: Уникальный идетификатор трека
           schema:
             type: string
       responses:
@@ -50,6 +50,7 @@ paths:
             Непредвиденная ошибка во время обработки запроса.
             Возможные error.code:
               - TRACK_FETCH_ERROR
+              - S3_DELETE_TRACK_ERROR
           content:
             application/json:
               schema:

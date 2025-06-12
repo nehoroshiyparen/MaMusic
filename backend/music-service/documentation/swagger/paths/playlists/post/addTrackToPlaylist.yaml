@@ -1,0 +1,79 @@
+paths:
+  /playlists/{playlist_id}/track:
+    post:
+      summary: Добавить трек в плейлист
+      tags: 
+        - Playlists
+      parameters:
+        - name: playlist_id
+          in: path
+          required: true
+          description: Уникальный идетификатор плейлиста
+          schema: 
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddOrDeleteTrackToPlaylistDto'
+      responses:
+        200: 
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: 'Track added to playlist'
+                      data:
+                        example: null
+        400: 
+          description:  |
+            Ошибка валидации.
+            Возможные error.code:
+              - VALIDATION_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        403: 
+          description: |
+            Ошибка - недостаточно прав.
+            Возможные error.code:
+              - NO_RIGHTS_FOR_EDITING_PLAYLIST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoAccessErrorResponse'
+        404:
+          description: |
+            Сущность не найдена.
+            Возможные error.code:
+              - TRACK_DOES_NOT_EXISTS
+              - PLAYLIST_DOES_NOT_EXISTS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        409:
+          description: |
+            Сущность с такими данными уже существует.
+            Возможные error.code:
+            - TRACK_ALREADY_IN_PLAYLIST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictErrorResponse'
+        500:
+        description: |
+          Непредвиденная ошибка во время обработки запроса.
+          Возможные error.code:
+            - ADD_TRACK_TO_PLAYLIST_ERROR
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternalErrorResponse'

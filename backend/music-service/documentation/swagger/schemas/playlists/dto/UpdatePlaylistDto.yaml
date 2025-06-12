@@ -1,0 +1,17 @@
+components:
+  schemas:
+    UpdatePlaylistDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Крутое назввание
+          nullable: true
+        description: 
+          type: string
+          example: Ничего себе. Реально крутой плейлист
+          nullable: true
+        is_public: 
+          type: boolean
+          example: false
+          nullable: true

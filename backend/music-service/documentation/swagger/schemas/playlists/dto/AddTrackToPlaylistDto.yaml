@@ -1,0 +1,9 @@
+components:
+  schemas:
+    AddOrDeleteTrackToPlaylistDto:
+      type: object
+      description: Dto для добавления и удаления трека в плейлист
+      properties:
+        track_id:
+          type: number
+          example: 25

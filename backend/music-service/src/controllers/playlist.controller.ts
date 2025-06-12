@@ -19,9 +19,13 @@ export class PlaylistController {
         try {
             const playlist_id = Number(req.params.playlist_id)
             
-            const validatedPlaylistId = isNumber.parse(playlist_id)
+            const validatedPlaylistId = isNumber.safeParse(playlist_id)
 
-            const playlist = await this.playlistService.fetchPlaylist(validatedPlaylistId)
+            if (!validatedPlaylistId.success) {
+                throw validatedPlaylistId.error
+            }
+
+            const playlist = await this.playlistService.fetchPlaylist(validatedPlaylistId.data)
 
             sendResponse(res, 200, 'Playlist fetched', playlist)
         } catch (e) {
@@ -31,13 +35,17 @@ export class PlaylistController {
 
     async fetchUserLikedPlaylists(req: Request, res: Response) {
         try {
-            const user_id = Number(req.params.user_id)
+            const user_id = Number(req.query.user_id)
                 ?? req.headers['x-user-id']
-                ?? (() => { throw ApiError.BadRequest('User ID not found', 'NO_USER_ID') })()
+                ?? (() => { throw ApiError.BadRequest('User ID not found in params', 'INVALID_REQUEST_PARAMS') })()
 
-            const validatedUserId = isNumber.parse(user_id)
+            const validatedUserId = isNumber.safeParse(user_id)
+
+            if (!validatedUserId.success) {
+                throw validatedUserId.error
+            }
             
-            const likedPlaylists = await this.playlistService.fetchUserLikedPlaylists(validatedUserId)
+            const likedPlaylists = await this.playlistService.fetchUserLikedPlaylists(validatedUserId.data)
 
             sendResponse(res, 200, 'Liked playlists fetched', likedPlaylists)
         } catch (e) {
@@ -50,13 +58,13 @@ export class PlaylistController {
             const playlistDtoRaw = req.body
             const user_id = Number(req.headers['x-user-id'])
 
-            if (!user_id) {
-                throw ApiError.BadRequest('User ID not provided', 'NO_USER_ID')
+            const playlistDtoValidated = createPlaylistSchema.safeParse(playlistDtoRaw)
+
+            if (!playlistDtoValidated.success) {
+                throw playlistDtoValidated.error
             }
 
-            const playlistDtoValidated: CreatePlaylistDto = createPlaylistSchema.parse(playlistDtoRaw)
-
-            const url = await this.playlistService.createPlaylist(playlistDtoValidated, user_id)
+            const url = await this.playlistService.createPlaylist(playlistDtoValidated.data, user_id)
 
             sendResponse(res, 200, 'Playlist created', url)
         } catch (e) {
@@ -70,9 +78,13 @@ export class PlaylistController {
             const playlist_id = Number(req.params.playlist_id)
             const { patch } = req.body
 
-            const validatedPatch = updatePlaylistSchema.parse(patch)
+            const validatedPatch = updatePlaylistSchema.safeParse(patch)
 
-            await this.playlistService.updatePlaylist(user_id, playlist_id, validatedPatch)
+            if (!validatedPatch.success) {
+                throw validatedPatch.error
+            }
+
+            await this.playlistService.updatePlaylist(user_id, playlist_id, validatedPatch.data)
 
             sendResponse(res, 200, 'Playlist updated')
         } catch (e) {
@@ -86,9 +98,13 @@ export class PlaylistController {
 
             const playlist_id = Number(req.params.playlist_id)
 
-            const validatedPlaylistId = isNumber.parse(playlist_id)
+             const validatedPlaylistId = isNumber.safeParse(playlist_id)
 
-            await this.playlistService.likePlaylist(user_id, validatedPlaylistId)
+            if (!validatedPlaylistId.success) {
+                throw validatedPlaylistId.error
+            }
+
+            await this.playlistService.likePlaylist(user_id, validatedPlaylistId.data)
 
             sendResponse(res, 200, 'Playlist liked')
         } catch (e) {
@@ -102,9 +118,13 @@ export class PlaylistController {
 
             const playlist_id = Number(req.params.playlist_id)
 
-            const validatedPlaylistId = isNumber.parse(playlist_id)
+            const validatedPlaylistId = isNumber.safeParse(playlist_id)
 
-            await this.playlistService.dislikePlaylist(user_id, validatedPlaylistId)
+            if (!validatedPlaylistId.success) {
+                throw validatedPlaylistId.error
+            }
+
+            await this.playlistService.dislikePlaylist(user_id, validatedPlaylistId.data)
 
             sendResponse(res, 200, 'Playlist disliked')
         } catch (e) {
@@ -118,11 +138,15 @@ export class PlaylistController {
             const { track_id } = req.body
             const user_id = Number(req.headers['x-user-id'])
 
-            const validatedDto: AddTrackToPlaylistDto = addTrackToPlaylistSchema.parse({ playlist_id, track_id})
+            const validatedDto = addTrackToPlaylistSchema.safeParse({ playlist_id, track_id})
 
-            const result = await this.playlistService.addTrackToPlaylist(validatedDto.playlist_id, validatedDto.track_id, user_id)
+            if (!validatedDto.success) {
+                throw validatedDto.error
+            }
 
-            sendResponse(res, 200, 'Track added', result)
+            await this.playlistService.addTrackToPlaylist(validatedDto.data.playlist_id, validatedDto.data.track_id, user_id)
+
+            sendResponse(res, 200, 'Track added to playlist')
         } catch (e) {
             sendError(res, e)
         }
@@ -134,13 +158,15 @@ export class PlaylistController {
             const { track_id } = req.body
             const user_id = Number(req.headers['x-user-id'])
 
-            console.log(track_id)
+                        const validatedDto = addTrackToPlaylistSchema.safeParse({ playlist_id, track_id})
 
-            const validatedDto: DeleteTrackFromPlaylistDto = deleteTrackFromPlaylistSchema.parse({ playlist_id, track_id })
+            if (!validatedDto.success) {
+                throw validatedDto.error
+            }
 
-            const result = await this.playlistService.deleteTrackFromPlaylist(validatedDto.playlist_id, validatedDto.track_id, user_id)
+            await this.playlistService.deleteTrackFromPlaylist(validatedDto.data.playlist_id, validatedDto.data.track_id, user_id)
 
-            sendResponse(res, 200, 'Track deleted', result)
+            sendResponse(res, 200, 'Track deleted from playlist')
         } catch (e) {
             sendError(res, e)
         }
@@ -152,9 +178,13 @@ export class PlaylistController {
 
             const playlist_id = Number(req.params.playlist_id)
 
-            const validatedPlaylistId = isNumber.parse(playlist_id)
+            const validatedPlaylistId = isNumber.safeParse(playlist_id)
 
-            await this.playlistService.deletePlaylist(user_id, validatedPlaylistId)
+            if (!validatedPlaylistId.success) {
+                throw validatedPlaylistId.error
+            }
+
+            await this.playlistService.deletePlaylist(user_id, validatedPlaylistId.data)
 
             sendResponse(res, 200, 'Playlist deleted')
         } catch (e) {

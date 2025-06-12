@@ -45,9 +45,7 @@ export class UploadService {
             await this.s3Service.sendObjectS3(trackKey, buffer, mimetype)
             uploadedKeys.push(trackKey)
 
-            const trackUrl = getPublicUrl(trackKey)
-
-            await this.trackService.updateTrackData(trackModel, { file_url: trackUrl }, transaction)
+            await this.trackService.updateTrackData(trackModel, { file_key: trackKey }, transaction)
 
             await this.trackService.trustedLikeTrack(user_id, trackModel.id, transaction)
 
@@ -78,6 +76,8 @@ export class UploadService {
                     })
                 )
             }
+
+            const trackUrl = getPublicUrl(trackKey)
 
             await transaction.commit()
             return { trackUrl: `${trackUrl}`, ...(coverKey && { coverUrl: coverKey }) }

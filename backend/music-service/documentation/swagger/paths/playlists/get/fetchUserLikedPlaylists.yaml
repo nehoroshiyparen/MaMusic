@@ -1,0 +1,48 @@
+paths:
+  /playlists/liked:
+    get:
+      summary: Получить плейлисты пользователя (Любимые). Без информации о треках
+      tags:
+        - Playlists
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          description: Уникальный идентификатор пользователя
+          schema:
+            type: number
+      responses:
+        200:
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: Liked playlists fetched
+                      data:
+                        $ref: '#/components/schemas/PlaylistDefaultData'
+        400:
+          description: |
+            Ошибка валидации или некорректный запрос.
+            Возможные error.code:
+              - VALIDATION_ERROR
+              - INVALID_REQUEST_PARAMS
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BadRequestErrorResponse'
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса.
+            Возможные error.code:
+              - PLAYLIST_LIST_FETCH_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'

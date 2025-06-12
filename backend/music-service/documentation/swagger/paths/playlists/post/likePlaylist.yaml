@@ -1,0 +1,63 @@
+paths:
+  /playlists/like/{playlist_id}:
+    post:
+      summary: Добавить плейлист в список понравившихся. "Лайкнуть"
+      tags: 
+        - Playlists
+      parameters:
+        - name: playlist_id
+          in: path
+          required: true
+          description: Уникальный идетификатор пелйлиста
+          schema: 
+            type: string
+      responses:
+        200:
+          description: Успешный запрос. Ничего не возвращает в поле data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: 'Playlist liked'
+                      data:
+                        example: null
+        400:   
+          description:  |
+            Ошибка валидации.
+            Возможные error.code:
+              - VALIDATION_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        404:
+          description: |
+            Сущность не найдена.
+            Возможные error.code:
+              - PLAYLIST_DOES_NOT_EXISTS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        409:
+          description: |
+            Сущность с такими данными уже существует.
+            Возможные error.code:
+            - PLAYLIST_ALREADY_LIKED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictErrorResponse'
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса.
+            Возможные error.code:
+              - PLAYLIST_LIKE_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'

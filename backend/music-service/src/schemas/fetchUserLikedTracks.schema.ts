@@ -4,6 +4,7 @@ import { TrackMetaSchema } from '../schemas/trackMeta.schema'
 export const fetchUserLikedTracksSchema = z.object({
     id: z.number(),
     owner_id: z.number(),
+    file_key: z.string(),
     is_public: z.boolean(),
     meta: TrackMetaSchema,
     likes: z

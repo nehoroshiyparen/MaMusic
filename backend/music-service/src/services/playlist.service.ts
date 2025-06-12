@@ -32,7 +32,7 @@ export class PlaylistService {
             const likedPlaylists = await this.playlistRepository.fetchUserLikedPlaylists(user_id)
             return likedPlaylists
         } catch (e) {
-            rethrowAsApiError('Error while fetching users playlists', 'PLAYLISTS_FETCH_ERROR', e)
+            rethrowAsApiError('Error while fetching users playlists', 'PLAYLIST_LIST_FETCH_ERROR', e)
         }
     }
 
@@ -45,11 +45,9 @@ export class PlaylistService {
 
             const playlist = await this.playlistRepository.createPlaylist(user_id, url, transaction)
 
-            console.log(playlist.id)
-
             await this.playlistRepository.likePlaylist(user_id, playlist.id, transaction)
 
-            const track = await this.trackService.fetchTrack(playlistDto.track.id)
+            const track = await this.trackService.fetchTrack(playlistDto.track_id)
 
             await this.playlistRepository.addTrack(playlist.id, track.id, 1, transaction)
 
@@ -105,6 +103,8 @@ export class PlaylistService {
                 throw ApiError.NotFound('Track does not exists', 'TRACK_DOES_NOT_EXISTS')
             }
 
+            await this.playlistAssertions.ensureTrackDoesNotInPlaylist(playlist_id, track_id)
+
             const maxOrder = await this.playlistRepository.getMaxOrder(playlist_id)
             const nextOrderNumber = maxOrder ? maxOrder + 1 : 1
 
@@ -130,8 +130,6 @@ export class PlaylistService {
             await this.playlistRepository.removeTrack(playlist_id, track_id)
 
             await this.playlistRepository.decrementOrederAfter(playlist_id, trackRow.order)
-
-            return { success: true }
         } catch (e) {
             throw rethrowAsApiError('Error while removing track from playlist', 'REMOVE_TRACK_FROM_PLAYLIST_ERROR', e)
         }

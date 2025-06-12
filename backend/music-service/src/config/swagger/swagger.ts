@@ -17,8 +17,8 @@ const options = {
         ]
     },
     apis: [
-        path.join(__dirname, './**/*.yaml'),
-        path.join(__dirname, '../../../../shared/swagger/**/*.yaml'),
+        path.join(__dirname, '../../../documentation/**/*.yaml'),
+        path.join(__dirname, '../../../../shared/documentation/swagger/**/*.yaml'),
     ],
 }
 

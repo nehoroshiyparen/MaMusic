@@ -4,7 +4,7 @@ import TrackMeta from "./TrackMeta.model";
 
 class Track extends Model {
     public id!: number;
-    public file_url!: string;
+    public file_key!: string;
     public owner_id!: number;
     public is_public!: boolean;
 }
@@ -16,7 +16,7 @@ Track.init(
             primaryKey: true,
             autoIncrement: true,
         },
-        file_url: {
+        file_key: {
             type: DataTypes.TEXT,
             allowNull: false,
         },

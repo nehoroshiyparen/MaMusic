@@ -11,18 +11,18 @@ function getController() {
 }
 
 router.get(
-    '/:track_id',
+    '/liked',
     createHandler(() => {
         const trackController = getController()
-        return trackController.fetchTrack.bind(trackController)
+        return trackController.fetchUserLikedTracks.bind(trackController)
     })
 )
 
 router.get(
-    '/liked/:user_id',
+    '/:track_id',
     createHandler(() => {
         const trackController = getController()
-        return trackController.fetchUserLikedTracks.bind(trackController)
+        return trackController.fetchTrack.bind(trackController)
     })
 )
 
@@ -31,6 +31,14 @@ router.post(
     createHandler(() => {
         const trackController = getController()
         return trackController.likeTrack.bind(trackController)
+    })
+)
+
+router.post(
+    '/dislike/:track_id',
+    createHandler(() => {
+        const trackController = getController()
+        return trackController.dislikeTrack.bind(trackController)
     })
 )
 

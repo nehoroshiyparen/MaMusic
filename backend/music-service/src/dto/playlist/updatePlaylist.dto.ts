@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const updatePlaylistSchema = z.object({
     title: z.string().optional(),
     description: z.string().max(300).optional(),
-    isPublic: z.boolean().optional()
+    is_public: z.boolean().optional()
 }).refine(
     (data) => Object.keys(data).length > 0,
     {

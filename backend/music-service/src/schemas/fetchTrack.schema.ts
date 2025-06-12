@@ -4,7 +4,7 @@ import { TrackMetaSchema } from './trackMeta.schema'
 export const fetchTrackSchema = z.object({
     id: z.number(),
     owner_id: z.number(),
-    file_url: z.string(),
+    file_key: z.string(),
     is_public: z.boolean(),
     meta: TrackMetaSchema,
 })

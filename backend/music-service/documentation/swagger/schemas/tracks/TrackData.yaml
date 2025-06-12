@@ -10,7 +10,7 @@ components:
         owner_id:
           type: number
           example: 1
-        file_url:
+        file_key:
           type: string
           format: uri
           example: https://console.yandex.cloud/folders/b1gt7k3osg4pjv1r55lr/storage/buckets/nehorosiyparen-music?key=tracks%2F25_Looser,_Baby__Hazbin_Hotel

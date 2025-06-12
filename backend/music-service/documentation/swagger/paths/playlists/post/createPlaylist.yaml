@@ -1,0 +1,54 @@
+paths:
+  /playlists:
+    post:
+      summary: Создать плейлист
+      tags:
+        - Playlists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlaylistDto'
+      responses:
+        200:
+          description: Успешый запрос. Возвращается объект с ссылкой на плейлист
+          content:
+            application/json:
+              schema:
+                allOf: 
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: 'Playlist created'
+                      data: 
+                        $ref: '#/components/schemas/CreatePlaylistData'
+        400:   
+          description:  |
+            Ошибка валидации.
+            Возможные error.code:
+              - VALIDATION_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        404:
+          description: |
+            Сущность не найдена в базе данных.
+            Возможные error.code:
+              - TRACK_DOES_NOT_EXISTS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса.
+            Возможные error.code:
+              - TRACK_FETCH_ERROR
+              - PLAYLIST_CREATE_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'

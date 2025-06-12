@@ -1,0 +1,10 @@
+components:
+  schemas:
+    CreatePlaylistDto:
+      description: Dto для создания плейлиста
+      type: object
+      properties: 
+        track_id: 
+          type: number
+          example: 25
+          description: Id трека, который помещается в плейлист

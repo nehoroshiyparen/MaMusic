@@ -12,9 +12,11 @@ export class TrackController {
 
     async fetchUserLikedTracks(req: Request, res: Response) {
         try {
-            const user_id = req.params.user_id
+            const user_id = req.query.user_id
                 ?? req.headers['x-user-id']
-                ?? (() => { throw ApiError.BadRequest('User ID not found', 'NO_USER_ID') })()
+                ?? (() => { throw ApiError.BadRequest('User ID not found in params', 'INVALID_REQUEST_PARAMS') })()
+
+            console.log(req.query)
             
             const { limit, offset } = req.params
 
@@ -49,11 +51,34 @@ export class TrackController {
             const user_id = Number(req.headers['x-user-id'])
             const track_id = Number(req.params.track_id)
 
-            const validatedTrackId = isNumber.parse(track_id)
+            const validatedTrackId = isNumber.safeParse(track_id)
 
-            await this.trackService.likeTrack(user_id, validatedTrackId)
+            if (!validatedTrackId.success) {
+                throw validatedTrackId.error
+            }
+
+            await this.trackService.likeTrack(user_id, validatedTrackId.data)
 
             sendResponse(res, 200, 'Track liked')
+        } catch (e) {
+            sendError(res, e)
+        }
+    }
+
+    async dislikeTrack(req: Request, res: Response) {
+        try {
+            const user_id = Number(req.headers['x-user-id'])
+            const track_id = Number(req.params.track_id)
+
+            const validatedTrackId = isNumber.safeParse(track_id)
+
+            if (!validatedTrackId.success) {
+                throw validatedTrackId.error
+            }
+
+            await this.trackService.dislikeTrack(user_id, validatedTrackId.data)
+
+            sendResponse(res, 200, 'Track disliked')
         } catch (e) {
             sendError(res, e)
         }
@@ -63,9 +88,13 @@ export class TrackController {
         try {
             const track_id = Number(req.params.track_id)
 
-            const validatedTrackId = isNumber.parse(track_id)
+            const validatedTrackId = isNumber.safeParse(track_id)
 
-            await this.trackService.deleteTrack(validatedTrackId)
+            if (!validatedTrackId.success) {
+                throw validatedTrackId.error
+            }
+
+            await this.trackService.deleteTrack(validatedTrackId.data)
 
             sendResponse(res, 200, 'Track deleted')
         } catch (e) {

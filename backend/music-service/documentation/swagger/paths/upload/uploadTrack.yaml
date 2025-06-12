@@ -74,6 +74,7 @@
             - TRACK_META_CREATE_ERROR
             - GENRE_FIND_OR_CREATE_ERROR
             - GENRE_TO_META_ATTACH_ERROR
+            - S3_ENTITY_CREATE_ERROR
         content:
           application/json:
             schema:

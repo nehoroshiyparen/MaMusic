@@ -1,0 +1,55 @@
+paths:
+  /playlists/dislike/{playlist_id}:
+    post:
+      summary: Удаляет плейлист из списка понравившихся. "Дизлайкнуть"
+      tags:
+        - Playlists
+      parameters:
+        - name: playlist_id
+          in: path
+          required: true
+          description: Уникальный идетификатор пелйлиста
+          schema: 
+            type: string
+      responses:
+        200:
+          description: Успешный запрос. Ничего не возвращает в поле data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: 'Playlist disliked'
+                      data:
+                        example: null
+        400: 
+          description:  |
+            Ошибка валидации.
+            Возможные error.code:
+              - VALIDATION_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        404:
+          description: |
+            Сущность не найдена.
+            Возможные error.code:
+              - PLAYLIST_DOES_NOT_EXISTS
+              - PLAYLIST_NOT_LIKED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса.
+            Возможные error.code:
+              - PLAYLIST_DISLIKE_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'

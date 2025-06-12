@@ -18,7 +18,7 @@ export class StreamService {
 
             const byteRange = `bytes=${start}-${end ?? ''}`
 
-            const response = await this.s3Service.getStreamByRange(track.file_url, byteRange)
+            const response = await this.s3Service.getStreamByRange(track.file_key, byteRange)
 
             return response
         }

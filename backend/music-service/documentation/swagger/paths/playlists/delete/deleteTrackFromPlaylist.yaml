@@ -1,0 +1,71 @@
+paths:
+  /playlists/{playlist_id}/track:
+    delete:
+      summary: Удалить трек из плейлиста
+      tags: 
+        - Playlists
+      parameters:
+        - name: playlist_id
+          in: path
+          required: true
+          description: Уникальный идетификатор плейлиста
+          schema: 
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddOrDeleteTrackToPlaylistDto'
+      responses:
+        200: 
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: 'Track deleted from playlist'
+                      data:
+                        example: null
+        400: 
+          description:  |
+            Ошибка валидации.
+            Возможные error.code:
+              - VALIDATION_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        403: 
+          description: |
+            Ошибка - недостаточно прав.
+            Возможные error.code:
+              - NO_RIGHTS_FOR_EDITING_PLAYLIST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoAccessErrorResponse'
+        404:
+          description: |
+            Сущность не найдена в базе данных.
+            Возможные error.code:
+              - PLAYLIST_DOES_NOT_EXISTS
+              - TRACK_DOES_NOT_EXISTS
+              - TRACK_NOT_IN_PLAYLIST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorResponse'
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса.
+            Возможные error.code:
+              - REMOVE_TRACK_FROM_PLAYLIST_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'

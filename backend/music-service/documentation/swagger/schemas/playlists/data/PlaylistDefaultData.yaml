@@ -1,0 +1,11 @@
+components:
+  schemas:
+    PlaylistDefaultData:
+      description: Основная информация о плейлисте. ( для отображения списка плейлистов ). Без информации о треках
+      allOf: 
+        - $ref: '#/components/schemas/PlaylistExtendedData'
+        - type: object
+          properties: 
+            playlist_tracks: 
+              example: null
+              description: Без информации о треках

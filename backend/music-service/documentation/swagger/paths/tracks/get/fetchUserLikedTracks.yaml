@@ -1,0 +1,50 @@
+paths:
+  /tracks/liked:
+    get:
+      summary: Позволяет получить массив "Любимых треков" пользователя
+      tags: 
+        - Tracks
+      parameters:
+        - name: user_id
+          in: query
+          required: false
+          description: | 
+            Параметр указывается в query, если нужно получить список треков другого человека.
+            Если не указывать, то вернет список взависимости от id в req.headers
+          schema: 
+            type: number
+      responses:
+        200:
+          description: Успешный запрос. Возвращает список треков, включая их метаданные
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      message: 
+                        example: Tracks fetched
+                      data: 
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TrackData' 
+        400:
+          description: |
+            Некорректный запрос.
+            Возможные error.code:
+              - INVALID_REQUEST_PARAMS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorResponse'
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса
+            Возможные error.code
+              - LIKED_TRACKS_FETCH_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'
+

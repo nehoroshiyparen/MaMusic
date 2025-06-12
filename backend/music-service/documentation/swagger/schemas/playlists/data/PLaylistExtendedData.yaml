@@ -1,0 +1,40 @@
+components: 
+  schemas:
+    PlaylistExtendedData:
+      description: Расширенная информация о плейлисте, включая информацию о треках и их метаданных
+      type: object
+      properties:
+        owner_id:
+          type: number
+          example: 1
+        url:
+          type: string
+          format: uri
+          example: http://music.app/playlists/c1f3b705-4360-447b-a034-60eddd758ec6
+          description: Ссылка на страницу плейлиста
+        title: 
+          type: string
+          example: Крутой плейлист
+        description:
+          type: string
+          example: Писи попы мармеладки))))
+        cover_url:
+          type: string
+          nullable: true
+          format: uri
+          example: null
+        is_public:
+          type: boolean
+          example: false
+        playlist_tracks:
+          type: array
+          description: Массив с треками
+          items:
+            type: object
+            properties: 
+              order: 
+                type: number
+                example: 1 
+                description: Порядковый номер трека в плейлисте
+              track: 
+                $ref: '#/components/schemas/TrackData'

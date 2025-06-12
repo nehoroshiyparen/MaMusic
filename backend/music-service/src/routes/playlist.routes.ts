@@ -11,18 +11,18 @@ function getController() {
 }
 
 router.get(
-    '/:playlist_id',
+    '/liked',
     createHandler(() => {
         const playlistController = getController()
-        return playlistController.fetchPlaylist.bind(playlistController)
+        return playlistController.fetchUserLikedPlaylists.bind(playlistController)
     })
 )
 
 router.get(
-    '/liked/:user_id',
+    '/:playlist_id',
     createHandler(() => {
         const playlistController = getController()
-        return playlistController.fetchUserLikedPlaylists.bind(playlistController)
+        return playlistController.fetchPlaylist.bind(playlistController)
     })
 )
 

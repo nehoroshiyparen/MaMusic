@@ -71,7 +71,9 @@ export class TrackService {
 
     async likeTrack(user_id: number, track_id: number, transaction?: Transaction): Promise<void> {
         try {
-            this.trackAssertions.ensureTrackExists(track_id)
+            await this.trackAssertions.ensureTrackExists(track_id)
+
+            await this.trackAssertions.ensureTrackDoNotLiked(user_id, track_id)
 
             await this.trackRepository.likeTrack(user_id, track_id, transaction)
         } catch (e) {
@@ -87,9 +89,22 @@ export class TrackService {
         }
     }
 
+    async dislikeTrack(user_id: number, track_id: number, transaction?: Transaction): Promise<void> {
+        try {
+            await this.trackAssertions.ensureTrackExists(track_id)
+
+            await this.trackAssertions.ensureTrackLiked(user_id, track_id)
+
+            await this.trackRepository.dislikeTrack(user_id, track_id, transaction)
+        } catch (e) {
+            rethrowAsApiError('Error while disliking track', 'TRACK_DISLIKE_ERROR', e)
+        }
+    }
+
     async deleteTrack(track_id: number): Promise<void> {
         const transaction = await this.sequelize.transaction()
         try {
+            await this.trackAssertions.ensureTrackExists(track_id)
             const trackRaw = await this.trackRepository.fetchTrack(track_id)
             const track = fetchTrackSchema.parse(trackRaw)
 

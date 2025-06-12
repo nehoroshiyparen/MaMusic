@@ -1,0 +1,10 @@
+components:
+  schemas:
+    CreatePlaylistData:
+      description: Ответ в виде схемы данных при создании плейлиста. В текущей версии возвращает только ссылку на плейлист
+      type: object
+      properties:
+        url:  
+          type: string
+          format: uri
+          example: http://music.app/playlists/973d2e2a-0d2d-4b11-b168-3d5c64c707d9

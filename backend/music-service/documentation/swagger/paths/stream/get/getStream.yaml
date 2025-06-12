@@ -1,0 +1,53 @@
+paths:
+  /stream/{id}:
+    get:
+      summary: Стриминг аудио по ID трека
+      tags:
+        - Stream
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор трека
+          schema:
+            type: integer
+        - name: Range
+          in: header
+          required: true
+          description: Заголовок HTTP Range для запроса части аудиофайла
+          schema:
+            type: string
+            example: bytes=0-    # пример минимального запроса
+      responses:
+        206:
+          description: Успешный частичный ответ (аудио)
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: |
+            Ошибка запроса.
+            Возможные error.code:
+              - RANGE_REQUERED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        404:
+          description: |
+            Сущность не найдена в базе данных.
+            Возможные error.code:
+              - TRACK_DOES_NOT_EXISTS
+        500:
+          description: |
+            Непредвиденная ошибка во время обработки запроса.
+            Возможные error.code:
+              - TRACK_LIKE_ERROR
+              - STREAM_FETCH_ERROR
+              - S3_STREAM_FETCH_ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalErrorResponse'

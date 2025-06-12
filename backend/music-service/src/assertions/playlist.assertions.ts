@@ -33,7 +33,7 @@ export class PlaylistAssertions {
         })
 
         if (!attachment) {
-            throw ApiError.BadRequest('Playlist not liked', 'PLAYLIST_NOT_LIKED')
+            throw ApiError.NotFound('Playlist not liked', 'PLAYLIST_NOT_LIKED')
         }
     }
 
@@ -58,6 +58,14 @@ export class PlaylistAssertions {
         }
 
         return trackRow
+    }
+
+    async ensureTrackDoesNotInPlaylist(playlist_id: number, track_id: number): Promise<void> {
+        const trackRow = await this.playlistRepository.findTrackInPlaylist(playlist_id, track_id)
+
+        if (trackRow) {
+            throw ApiError.Conflict('Track already in playlist', 'TRACK_ALREADY_IN_PLAYLIST')
+        }
     }
 
     ensureUserCanEdit(user_id: number, playlist: Playlist): void {

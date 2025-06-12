@@ -1,0 +1,17 @@
+components:
+  schemas:
+    NoAccessErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseError'
+        - type: object
+          properties:
+            statusCode:
+              example: 403
+            message:
+              example: 'Predicted error'
+            error:
+              properties:
+                code:
+                  example: NO_ACCESS_FOR_THIS_ACTION
+                message:
+                  example: No access for this action

@@ -10,7 +10,7 @@ export class TrackRepository {
 
     async createTrack(params: Partial<TrackAttributes>, transaction?: Transaction): Promise<Track> {
         const track = await Track.create({
-            file_url: params.file_url || '',
+            file_key: params.file_key || '',
             owner_id: params.owner_id
         }, transaction ? { transaction } : undefined)
 
@@ -71,6 +71,15 @@ export class TrackRepository {
             track_id,
         }, transaction ? { transaction } : undefined)
     }
+
+    async dislikeTrack(user_id: number, track_id: number, transaction?: Transaction) {
+        await Track_Likes.destroy({
+            where: {
+                user_id,
+                track_id
+            }, ...(transaction ? { transaction } : undefined)
+        })
+    } 
 
     async deleteTrack(track_id: number, transaction?: Transaction) {
         await Track.destroy({
