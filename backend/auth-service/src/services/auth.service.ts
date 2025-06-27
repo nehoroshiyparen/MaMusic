@@ -78,7 +78,7 @@ export class AuthService {
             
             await transaction.commit()
     
-            return { accessToken, refreshToken }
+            return { accessToken, refreshToken, userPayload }
         } catch (e) {
             await transaction.rollback()
             throw rethrowAsApiError('Error while creating user', 'USER_CREATE_ERROR', e)
@@ -117,7 +117,7 @@ export class AuthService {
         const accessToken = await this.tokenService.generateAccessToken(userPayload)
         const refreshToken = await this.tokenService.generateRefreshToken(userPayload)
 
-        return { accessToken, refreshToken }
+        return { accessToken, refreshToken, userPayload }
     }
 
     async refresh(refreshToken: string) {

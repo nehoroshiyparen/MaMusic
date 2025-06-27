@@ -1,8 +1,8 @@
 import { Response } from 'express'
-import { ApiError } from 'shared/common/utils/ApiError/api-error'
+import { ApiError } from '../ApiError/api-error'
 import { logError } from '../logger/logger'
 import { isError } from '../typeGuards/isError'
-import { ApiResponse } from 'shared/common/types/api-response.interface'
+import { ApiResponse } from '../../types/api-response.interface'
 import { isZodError } from '../typeGuards/isZodError'
 
 export function sendError(res: Response, err: unknown) {

@@ -17,23 +17,23 @@ export const Register = async (req: Request, res: Response) => {
         const validatedData = RegisterDtoSchema.parse(req.body)
         const correlationId = req.headers['x-correlation-id'] as string
 
-        const tokens = await authService.register(validatedData, correlationId)
+        const { accessToken, refreshToken, userPayload } = await authService.register(validatedData, correlationId)
 
-        res.cookie('refreshToken', tokens.refreshToken, {
+        res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             sameSite: 'lax',
             secure: false,
             maxAge: Number(process.env.REFRESH_TOKEN_EXPIRES_IN)
         })
 
-        res.cookie('accessToken', tokens.accessToken, {
+        res.cookie('accessToken', accessToken, {
             httpOnly: true,
             sameSite: 'lax',
             secure: false,
             maxAge: Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
         })
 
-        sendResponse(res, 201, 'Register complited', null)
+        sendResponse(res, 201, 'Register complited', userPayload)
     } catch (e) {
         sendError(res, e)
     }
@@ -47,23 +47,23 @@ export const Login = async (req: Request, res: Response) => {
 
         const validatedData = LoginDtoSchema.parse(req.body)
 
-        const tokens = await authService.login(validatedData)
+        const { accessToken, refreshToken, userPayload } = await authService.login(validatedData)
 
-        res.cookie('refreshToken', tokens.refreshToken, {
+        res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             sameSite: 'lax',
             secure: false,
             maxAge: Number(process.env.REFRESH_TOKEN_EXPIRES_IN)
         })
 
-        res.cookie('accessToken', tokens.accessToken, {
+        res.cookie('accessToken', accessToken, {
             httpOnly: true,
             sameSite: 'lax',
             secure: false,
             maxAge: Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
         })
 
-        sendResponse(res, 201, 'Login complited', null)
+        sendResponse(res, 201, 'Login complited', userPayload)
     } catch (e) {
         sendError(res, e)
     }
