@@ -3,6 +3,15 @@ import styles from '../auth.form.module.scss'
 import { YandexSvg, GoogleSvg } from 'shared/components/svg/companies'
 import { UserSvg, EmailSvg, PasswordSvg, VisibleSvg } from 'shared/components/svg/icons'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import registrationResolver from '../../utils/validators/registration.validator'
+
+type FormData = {
+    username: string
+    email: string
+    password: string
+}
 
 type Props = {
     onSubmit: (username: string, email: string, password: string) => Promise<any>
@@ -11,24 +20,21 @@ type Props = {
 const RegisterForm: React.FC<Props> = ({
     onSubmit
 }) => {
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+        resolver: zodResolver(registrationResolver),
+        mode: 'onBlur'
+    })
+
     const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-    const [username, setUsername] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     
     const toggleVisibility = () => {
         setIsPasswordVisible(prev => !prev)
     }
 
-    const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        onSubmit(username, email, password)
-    } 
-
     return (
         <>
             <div className={styles.authFormWrapper}>
-                <form className={styles.authForm} onSubmit={handleSubmit}>
+                <form className={styles.authForm} onSubmit={handleSubmit(data => onSubmit(data.username, data.email, data.password))}>
                     <div className={styles.formLabel}>
                         Регистрация
                     </div>
@@ -42,10 +48,14 @@ const RegisterForm: React.FC<Props> = ({
                                 className={styles.input} 
                                 placeholder='Укажите ваш юзернейм' 
                                 type='username'
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                {...register('username')}
                             />
                         </div>
+                        {errors.username && (
+                            <span className={styles.error}>
+                                {errors.username.message}
+                            </span>
+                        )}
                     </div>
                     <div className={`${styles.emailForm} ${styles.form}`}>
                         <label className={styles.label}>
@@ -57,10 +67,14 @@ const RegisterForm: React.FC<Props> = ({
                                 className={styles.input} 
                                 placeholder='Укажите вашу почту' 
                                 type='email'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                {...register('email')}
                             />
                         </div>
+                        {errors.email && (
+                            <span className={styles.error}>
+                                {errors.email.message}
+                            </span>
+                        )}
                     </div>
                     <div className={`${styles.passwordForm} ${styles.form}`}>
                         <label className={styles.label}>
@@ -72,13 +86,17 @@ const RegisterForm: React.FC<Props> = ({
                                 className={styles.input} 
                                 placeholder='Укажите ваш пароль' 
                                 type={isPasswordVisible ? 'text' : 'password'}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                {...register('password')}
                             />
                             <button onClick={toggleVisibility} type='button'>
                                 <VisibleSvg/>
                             </button>
                         </div>
+                        {errors.password && (
+                            <span className={styles.error}>
+                                {errors.password.message}
+                            </span>
+                        )}
                     </div>
                     <button className={styles.submitButton} type='submit'>
                         Зарегистрироваться

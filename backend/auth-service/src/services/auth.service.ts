@@ -11,6 +11,9 @@ import { SagaManager } from 'shared/common/saga/sagaManager'
 import { AuthProducer } from "src/kafka/produsers/auth.producer";
 import { SagaReplyConsumer } from "src/kafka/consumers/sagaReply.consumer";
 import { SagaWaiter } from "shared/common/saga/sagaWaiter";
+import { logError, logInfo, logWarn } from "shared/common/utils/logger/logger";
+import { TokenPayload } from "shared/auth/payload/token.payload";
+import { CleanTokenPayload } from "shared/auth/payload/cleanToken.payload";
 
 export class AuthService {
     constructor(
@@ -26,19 +29,19 @@ export class AuthService {
         const transaction = await this.sequelize.transaction()
         const saga = new SagaManager()
 
-        const existingEmail = await this.userService.findUser({ email: data.email })
-        if (existingEmail) {
-            throw ApiError.Conflict('User with this email already exists', 'EMIAL_ALREADY_EXISTS')
-        }
-
-        const existingUsername = await this.userService.findUser({ username: data.username })
-        if (existingUsername) {
-            throw ApiError.Conflict('User with this username already exists', 'USERNAME_ALREADY_EXISTS')
-        }
-
-        const hashPassword = await this.passwordService.hashPassword(data.password)
-
         try {
+            const existingUsername = await this.userService.findUser({ username: data.username })
+            if (existingUsername) {
+                throw ApiError.Conflict('Пользователь с таким именем уже существует', 'USERNAME_ALREADY_EXISTS')
+            }
+
+            const existingEmail = await this.userService.findUser({ email: data.email })
+            if (existingEmail) {
+                throw ApiError.Conflict('Пользователь с такой почтой уже сущесвтует', 'EMIAL_ALREADY_EXISTS')
+            }
+
+            const hashPassword = await this.passwordService.hashPassword(data.password)
+
             const user = await this.userService.createUser({
                 username: data.username,
                 email: data.email,
@@ -81,7 +84,7 @@ export class AuthService {
             return { accessToken, refreshToken, userPayload }
         } catch (e) {
             await transaction.rollback()
-            throw rethrowAsApiError('Error while creating user', 'USER_CREATE_ERROR', e)
+            throw rethrowAsApiError('Ошибка при создании пользователя', 'USER_CREATE_ERROR', e)
         }
     }
 
@@ -154,5 +157,36 @@ export class AuthService {
         }
 
         return { message: 'Logged out successfully' }
+    }
+
+    async authMe(accessToken: string | null, refreshToken: string | null, correlationId: string | undefined): Promise<{ decoded: CleanTokenPayload, accessToken?: string }> {
+        try {
+            if (!accessToken) {
+                logWarn('No access token provided. Trying to refresh it', correlationId)
+                throw ApiError.Unauthorized('No access token provided', 'NO_ACCESS_TOKEN')
+            }
+            const decoded = this.tokenService.verifyAccesToken(accessToken)
+            return { decoded }
+        } catch (e) {
+            console.log(e)
+
+            if (!refreshToken) {
+                throw ApiError.Unauthorized('No refresh token provided', 'NO_REFRESH_TOKEN')
+            }
+
+            try {
+                logWarn('Access token expired; refreshing...', correlationId)
+
+                const decoded = await this.tokenService.verifyRefreshToken(refreshToken)
+
+                const newAccessToken = await this.tokenService.generateAccessToken(decoded)
+
+                logInfo(`Access token refreshed for user: ${decoded.username}`, correlationId)
+                return { decoded, accessToken: newAccessToken }
+            } catch (e) {
+                logError('Failed to refresh token', e, correlationId)
+                throw ApiError.Unauthorized('Failed to refresh the access token', 'ACCESS_TOKEN_REFRESH_ERROR')
+            }
+        }
     }
 }

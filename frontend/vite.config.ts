@@ -15,6 +15,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      src: path.resolve(__dirname, 'src'),
       shared: path.resolve(__dirname, 'src/shared'), // теперь точно работает
     },
   },

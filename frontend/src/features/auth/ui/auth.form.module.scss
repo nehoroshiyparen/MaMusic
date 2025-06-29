@@ -11,6 +11,9 @@ input {
     max-width: 590px;
 
     width: 40vw;
+
+    display: flex;
+    align-items: center;
 }
 
 .authForm {
@@ -65,6 +68,13 @@ input {
     gap: 9px;
 
     transition: 0.3s;
+}
+
+.error {
+    color: red;
+    font-size: 1.5rem;
+    margin-top: -10px;
+    box-sizing: border-box;
 }
 
 .inputForm:focus-within {

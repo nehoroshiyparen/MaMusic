@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import { TokenPayload } from 'shared/auth/payload/token.payload'
+import { CleanTokenPayload } from 'shared/auth/payload/cleanToken.payload'
 import RefreshToken from 'src/db/models/RefreshToken.model'
 import { Transaction } from 'sequelize'
 
@@ -16,7 +17,7 @@ export class TokenService {
     private accessTokenExpiresIn: number = Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
     private refreshTokenExpiresIn: number = Number(process.env.REFRESH_TOKEN_EXPIRES_IN)
 
-    async generateAccessToken(payload: TokenPayload) {
+    async generateAccessToken(payload: CleanTokenPayload) {
         const accessToken = jwt.sign(payload, this.accessPrivateKey, {
             algorithm: 'RS256',
             expiresIn: this.accessTokenExpiresIn
@@ -25,7 +26,7 @@ export class TokenService {
         return accessToken
     }
 
-    async generateRefreshToken(payload: TokenPayload, transaction?: Transaction) {
+    async generateRefreshToken(payload: CleanTokenPayload, transaction?: Transaction) {
         const refreshToken = jwt.sign(payload, this.refreshPrivateKey, {
             algorithm: 'RS256',
             expiresIn: this.refreshTokenExpiresIn
@@ -46,19 +47,25 @@ export class TokenService {
         return refreshToken
     }
 
-    verifyAccesToken(token: string): TokenPayload {
+    verifyAccesToken(token: string): CleanTokenPayload {
         try {
-            const decoded = jwt.verify(token, this.accessPublicKey, { algorithms: ['RS256'] }) as TokenPayload
-            return decoded
+            const decoded = jwt.verify(token, this.accessPrivateKey, { algorithms: ['RS256'] }) as TokenPayload
+            
+            const { exp, iat, ...cleanPayload } = decoded
+
+            return cleanPayload
         } catch (e) {
             throw new Error('Invalid or expired access token')
         }
     }
 
-    verifyRefreshToken(token: string): TokenPayload {
+    verifyRefreshToken(token: string): CleanTokenPayload {
         try {
-            const decoded = jwt.verify(token, this.refreshPublicKey, { algorithms: ['RS256'] }) as TokenPayload
-            return decoded
+            const decoded = jwt.verify(token, this.refreshPrivateKey, { algorithms: ['RS256'] }) as TokenPayload
+
+            const { exp, iat, ...cleanPayload } = decoded
+
+            return cleanPayload
         } catch (e) {
             throw new Error('Invalid or expired refresh token')
         }

@@ -15,10 +15,6 @@ export async function authenticateToken(req: Request, res: Response, next: NextF
   const accessToken = req.cookies?.accessToken
   const correlationId = req.headers['x-correlation-id'] as string | undefined
 
-  if (!accessToken) {
-    logWarn('No access token provided. Trying to refresh it', correlationId)
-  }
-
   try {
     const decoded = jwt.verify(accessToken, publicKey) as TokenPayload
     req.headers['x-user-id'] = String(decoded.id)

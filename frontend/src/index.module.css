@@ -27,6 +27,16 @@ a:hover {
 input {
   outline: none;
   font-family: "Mulish", sans-serif;
+  background: none;
+}
+
+input:-internal-autofill-selected,
+input:-webkit-autofill {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  transition: background-color 5000s ease-in-out 0s; /* чтобы цвет не мигал */
 }
 
 button {

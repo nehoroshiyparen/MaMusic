@@ -17,5 +17,16 @@ authProxy.use(
         pathRewrite: {
             "^/api/auth": "",
         },
+        cookieDomainRewrite: {
+            '*': '', // Удаляем Domain у всех кук
+        },
+        on: {
+            proxyReq: (proxyReq, req) => {
+                // Принудительно передаём куки если они есть
+                if (req.headers.cookie) {
+                    proxyReq.setHeader('Cookie', req.headers.cookie);
+                }
+            }
+        }
     })
 )

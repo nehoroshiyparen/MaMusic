@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { AuthService } from 'src/services/auth.service'
 import { LoginDtoSchema } from 'src/dto/login.dto'
 import { RegisterDtoSchema } from 'src/dto/register.dto'
 import { sendResponse, sendError } from 'shared/common/utils/http'
@@ -23,14 +22,16 @@ export const Register = async (req: Request, res: Response) => {
             httpOnly: true,
             sameSite: 'lax',
             secure: false,
-            maxAge: Number(process.env.REFRESH_TOKEN_EXPIRES_IN)
+            maxAge: Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+            path: '/',
         })
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             sameSite: 'lax',
             secure: false,
-            maxAge: Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
+            maxAge: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+            path: '/',
         })
 
         sendResponse(res, 201, 'Register complited', userPayload)
@@ -90,6 +91,34 @@ export const Logout = async (req: Request, res: Response) => {
         })
 
         sendResponse(res, 201, 'Logout complited', null)
+    } catch (e) {
+        sendError(res, e)
+    }
+}
+
+export const AuthMe = async (req: Request, res: Response) => {
+    const authService = getContainer().getAuthService()
+
+    try {
+        const accessToken = req.cookies?.accessToken
+        const refreshToken = req.cookies?.refreshToken
+        const correlationId = req.headers['x-correlation-id'] as string | undefined
+
+        const verifiedAccessToken = await authService.authMe(accessToken, refreshToken, correlationId)
+
+        req.headers['x-user-id'] = String(verifiedAccessToken.decoded.id)
+            
+        if (verifiedAccessToken.accessToken) {
+            res.cookie('accessToken', verifiedAccessToken.accessToken, {
+                httpOnly: true,
+                sameSite: 'lax',
+                secure: false,
+                maxAge: 1800000
+            })
+        }
+
+        sendResponse(res, 200, 'Authenticated', verifiedAccessToken.decoded)
+        
     } catch (e) {
         sendError(res, e)
     }
