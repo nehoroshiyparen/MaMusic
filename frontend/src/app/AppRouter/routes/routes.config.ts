@@ -23,3 +23,6 @@ export const appRoutes: {
         protected: false
     }
 ]
+
+export const privateRoutes = appRoutes.filter((route) => route.protected)
+export const publicRoutes = appRoutes.filter((route) => !route.protected)

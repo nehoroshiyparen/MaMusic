@@ -13,7 +13,6 @@ const RegisterPage = () => {
     const navigate = useNavigate()
     
     const container = getContainer()
-
     const authService = container.getAuthService()
 
     const dispatch = useAppDispatch()

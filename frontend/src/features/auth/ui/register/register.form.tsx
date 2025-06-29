@@ -20,7 +20,7 @@ type Props = {
 const RegisterForm: React.FC<Props> = ({
     onSubmit
 }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(registrationResolver),
         mode: 'onBlur'
     })
@@ -34,7 +34,9 @@ const RegisterForm: React.FC<Props> = ({
     return (
         <>
             <div className={styles.authFormWrapper}>
-                <form className={styles.authForm} onSubmit={handleSubmit(data => onSubmit(data.username, data.email, data.password))}>
+                <form className={styles.authForm} onSubmit={handleSubmit(data => {
+                    onSubmit(data.username, data.email, data.password)
+                })}>
                     <div className={styles.formLabel}>
                         Регистрация
                     </div>

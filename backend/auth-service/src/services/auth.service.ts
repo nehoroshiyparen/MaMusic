@@ -125,7 +125,7 @@ export class AuthService {
 
     async refresh(refreshToken: string) {
         if (!refreshToken) {
-            throw ApiError.Unauthorized('No refresh token provided', 'NO_TOKEN');
+            throw ApiError.Unauthorized('Ошибка авторизации', 'NO_REFRESH_TOKEN');
         }
 
         const payload = this.tokenService.verifyRefreshToken(refreshToken)
@@ -171,7 +171,7 @@ export class AuthService {
             console.log(e)
 
             if (!refreshToken) {
-                throw ApiError.Unauthorized('No refresh token provided', 'NO_REFRESH_TOKEN')
+                throw ApiError.Unauthorized('Ошибка авторизации', 'NO_REFRESH_TOKEN')
             }
 
             try {

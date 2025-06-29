@@ -7,7 +7,7 @@ const PrivateRoute = ({ children }: { children: React.ReactElement }) => {
     const isAuthenticated = useAppSelector(selectIsAuthenticated)
 
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace />
+        return <Navigate to='/login' replace />
     }
 
     return children
